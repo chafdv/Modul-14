@@ -1,5 +1,5 @@
 
-# <h1 align="center">Laporan Praktikum Struktur Data<br> Modul 14 MULTI LINKED LIST </h1>
+# <h1 align="center">Laporan Praktikum Struktur Data<br> Modul 14 GRAPH </h1>
 <p align="center">Osha Alfida Valyana / 103112430202</p>
 
 ## Dasar Teori
@@ -214,9 +214,9 @@ int main()
 ```
 
 ⁠ Output
-⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/guided13.png)
+⁠![Output guided](https://github.com/chafdv/Modul-14/blob/main/output/guided14.png)
 
-Program tersebut membuat struktur data parent–child dengan linked list. Setiap ParentNode menyimpan nama parent, pointer ke anak pertama, dan pointer ke parent berikutnya. Setiap ChildNode menyimpan nama child dan pointer ke child berikutnya. Fungsi createParent dan createChild membuat node baru, sedangkan insertParent menambahkan parent ke akhir daftar. insertChild mencari parent berdasarkan nama lalu menambahkan child di akhir daftar anak. Terakhir, printAll menampilkan setiap parent beserta seluruh child-nya secara berurutan.
+Program ini mengimplementasikan graph tidak berarah menggunakan adjacency list. Graph dapat ditampilkan strukturnya dan ditelusuri menggunakan metode DFS dan BFS dengan penanda visited agar node tidak dikunjungi lebih dari satu kali.
 
 
 ---
@@ -228,9 +228,9 @@ Program tersebut membuat struktur data parent–child dengan linked list. Setiap
 Buatlah implementasi ADT Graph pada file “graph.cpp” dan cobalah hasil implementasi ADT
 pada file “main.cpp”.
 
-### graph
+### graph.h
 
- ```cpp
+```
  #ifndef GRAPH_H
 #define GRAPH_H
 
@@ -268,11 +268,15 @@ void PrintBFS(Graph G, adrNode N);
 #endif
 ```
 
-Output
-⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/unguided13.png)
+ Output
+⁠![Output guided](https://github.com/chafdv/Modul-14/blob/main/output/unguided14.png)
 
+Program ini digunakan untuk membuat dan mengelola graph dengan representasi adjacency list. Setiap node bisa terhubung ke node lain melalui edge. Setelah graph dibuat, program melakukan penelusuran menggunakan DFS dan BFS untuk melihat urutan kunjungan node. DFS menelusuri graph secara mendalam, sedangkan BFS menelusuri secara melebar. Penanda visited digunakan agar node tidak dikunjungi lebih dari satu kali.
+
+---
 
 ### Soal 2
+
 Buatlah prosedur untuk menampilkanhasil penelusuran DFS. prosedur PrintDFS (Graph G, adrNode N);
 
 ### graph.cpp
@@ -396,8 +400,9 @@ void PrintBFS(Graph G, adrNode N) {
 ```
 
 Output
-⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/unguided13.png)
+⁠![Output guided](https://github.com/chafdv/Modul-14/blob/main/output/unguided14.png)
 
+Program ini digunakan untuk membuat dan mengelola graph dengan representasi adjacency list. Setiap node bisa terhubung ke node lain melalui edge. Setelah graph dibuat, program melakukan penelusuran menggunakan DFS dan BFS untuk melihat urutan kunjungan node. DFS menelusuri graph secara mendalam, sedangkan BFS menelusuri secara melebar. Penanda visited digunakan agar node tidak dikunjungi lebih dari satu kali.
 
 ---
 
@@ -450,9 +455,9 @@ int main() {
 ```
 
 Output
-⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/unguided13.png)
+⁠![Output guided](https://github.com/chafdv/Modul-14/blob/main/output/unguided14.png)
 
-
+Program ini digunakan untuk membuat dan mengelola graph dengan representasi adjacency list. Setiap node bisa terhubung ke node lain melalui edge. Setelah graph dibuat, program melakukan penelusuran menggunakan DFS dan BFS untuk melihat urutan kunjungan node. DFS menelusuri graph secara mendalam, sedangkan BFS menelusuri secara melebar. Penanda visited digunakan agar node tidak dikunjungi lebih dari satu kali.
 
 
 ## Referensi
