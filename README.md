@@ -10,124 +10,208 @@ Graph adalah struktur data non-linear yang terdiri dari dua komponen utama: vert
 
 ### Soal 1
 
-``cpp
-
+```cpp
 #include <iostream>
-#include <string>
+#include <queue>
+#include <stack>
+
 using namespace std;
 
-struct ChildNode
+typedef char infoGraph;
+
+struct ElmNode;
+struct ElmEdge;
+
+typedef ElmNode *adrNode;
+typedef ElmEdge *adrEdge;
+
+struct ElmNode
 {
-    string info;
-    ChildNode *next;
+    infoGraph info;
+    int visited;
+    adrEdge firstEdge;
+    adrNode next;
 };
 
-struct ParentNode
+struct ElmEdge
 {
-    string info;
-    ChildNode *childHead;
-    ParentNode *next;
+    adrNode node;
+    adrEdge next;
 };
 
-ParentNode *createParent(string info)
+struct Graph
 {
-    ParentNode *newNode = new ParentNode;
-    newNode->info = info;
-    newNode->childHead = NULL;
-    newNode->next = NULL;
-    return newNode;
+    adrNode first;
+};
+
+void CreateGraph(Graph &G)
+{
+    G.first = NULL;
 }
 
-ChildNode *createChild(string info)
+adrNode AllocateNode(infoGraph X)
 {
-    ChildNode *newNode = new ChildNode;
-    newNode->info = info;
-    newNode->next = NULL;
-    return newNode;
+    adrNode P = new ElmNode;
+    P->info = X;
+    P->visited = 0;
+    P->firstEdge = NULL;
+    P->next = NULL;
+    return P;
 }
 
-void insertParent(ParentNode *&head, string info)
+adrEdge AllocateEdge(adrNode N)
 {
-    ParentNode *newNode = createParent(info);
-    if (head == NULL)
-    {
-        head = newNode;
-    }
-    else
-    {
-        ParentNode *temp = head;
-        while (temp->next != NULL)
-        {
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
+    adrEdge P = new ElmEdge;
+    P->node = N;
+    P->next = NULL;
+    return P;
 }
 
-void insertChild(ParentNode *head, string parentInfo, string childInfo)
+void InsertNode(Graph &G, infoGraph X)
 {
-    ParentNode *p = head;
-    while (p != NULL && p->info != parentInfo)
-    {
-        p = p->next;
-    }
-
-    if (p != NULL)
-    {
-        ChildNode *newChild = createChild(childInfo);
-        if (p->childHead == NULL)
-        {
-            p->childHead = newChild;
-        }
-        else 
-        {
-            ChildNode *c = p->childHead;
-            while (c->next != NULL)
-            {
-                c = c->next;
-            }
-            c->next = newChild;
-        }
-    }
+    adrNode P = AllocateNode(X);
+    P->next = G.first;
+    G.first = P;
 }
 
-void printAll(ParentNode *head)
+adrNode FindNode(Graph G, infoGraph X)
 {
-    ParentNode *p = head;
-    while (p != NULL)
+    adrNode P = G.first;
+    while (P != NULL)
     {
-        cout << p->info;
-        ChildNode *c = p->childHead;
-        if (c != NULL)
+        if (P->info == X)
+            return P;
+        P = P->next;
+    }
+    return NULL;
+}
+
+void ConnectNode(Graph &G, infoGraph A, infoGraph B)
+{
+    adrNode N1 = FindNode(G, A);
+    adrNode N2 = FindNode(G, B);
+
+    if (N1 == NULL || N2 == NULL)
+    {
+        cout << "Node tidak ditemukan!\n";
+        return;
+    }
+
+    adrEdge E1 = AllocateEdge(N2);
+    E1->next = N1->firstEdge;
+    N1->firstEdge = E1;
+
+    adrEdge E2 = AllocateEdge(N1);
+    E2->next = N2->firstEdge;
+    N2->firstEdge = E2;
+}
+
+void PrintInfoGraph(Graph G)
+{
+    adrNode P = G.first;
+    while (P != NULL)
+    {
+        cout << "Node " << P->info << " terhubung dengan: ";
+        adrEdge E = P->firstEdge;
+        while (E != NULL)
         {
-            while (c != NULL)
-            {
-                cout << " -> " << c->info;
-                c = c->next;
-            }
+            cout << E->node->info << " ";
+            E = E->next;
         }
         cout << endl;
-        p = p->next;
+        P = P->next;
+    }
+}
+
+void ResetVisited(Graph &G)
+{
+    adrNode P = G.first;
+    while (P != NULL)
+    {
+        P->visited = 0;
+        P = P->next;
+    }
+}
+
+void PrintDFS(Graph &G, adrNode N)
+{
+    if (N == NULL)
+        return;
+
+    N->visited = 1;
+    cout << N->info << " ";
+
+    adrEdge E = N->firstEdge;
+    while (E != NULL)
+    {
+        if (E->node->visited == 0)
+        {
+            PrintDFS(G, E->node);
+        }
+        E = E->next;
+    }
+}
+
+void PrintBFS(Graph &G, adrNode N)
+{
+    if (N == NULL)
+        return;
+
+    queue<adrNode> Q;
+    Q.push(N);
+
+    while (!Q.empty())
+    {
+        adrNode curr = Q.front();
+        Q.pop();
+
+        if (curr->visited == 0)
+        {
+            curr->visited = 1;
+            cout << curr->info << " ";
+
+            adrEdge E = curr->firstEdge;
+            while (E != NULL)
+            {
+                if (E->node->visited == 0)
+                {
+                    Q.push(E->node);
+                }
+                E = E->next;
+            }
+        }
     }
 }
 
 int main()
 {
-    ParentNode *list = NULL;
+    Graph G;
+    CreateGraph(G);
+    InsertNode(G, 'A');
+    InsertNode(G, 'C');
+    InsertNode(G, 'D');
+    InsertNode(G, 'E');
+    
+    ConnectNode(G, 'A', 'B');
+    ConnectNode(G, 'A', 'C');
+    ConnectNode(G, 'B', 'D');
+    ConnectNode(G, 'C', 'E');
 
-    insertParent(list, "Parent Node 1");
-    insertParent(list, "Parent Node 2");
+    cout << "=== Struktur Graph (Adjacency List) ===\n";
+    PrintInfoGraph(G);
 
-    insertChild(list, "Parent Node 1", "Child Node A");
-    insertChild(list, "Parent Node 1", "Child Node B");
-    insertChild(list, "Parent Node 2", "Child Node C");
+    cout << "\n=== DFS dari Node A ===\n";
+    ResetVisited(G);
+    PrintDFS(G, FindNode(G, 'A'));
 
-    printAll(list);
+    cout << "\n\n=== BFS dari Node A ===\n";
+    ResetVisited(G);
+    PrintBFS(G, FindNode(G, 'A'));
 
+    cout << endl;
     return 0;
 }
 ```
-
 
 ⁠ Output
 ⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/guided13.png)
@@ -139,250 +223,227 @@ Program tersebut membuat struktur data parent–child dengan linked list. Setiap
 
 ## Unguided
 
-Perhatikan program 46 multilist.h, buat multilist.cpp untuk implementasi semua fungsi pada multilist.h. Buat main.cpp untuk pemanggilan fungsi-fungsi tersebut. Buatlah ADT Multi Linked list sebagai berikut di dalam file “circularlist.h”, Buatlah implementasi ADT Doubly Linked list pada file “circularlist.cpp”. Tambahkan fungsi/prosedur berikut pada file “main.cpp”.
+### Soal 1
 
-### circularlist.h
+Buatlah implementasi ADT Graph pada file “graph.cpp” dan cobalah hasil implementasi ADT
+pada file “main.cpp”.
+
+### graph
 
  ```cpp
-#ifndef CIRCULARLIST_H_INCLUDED
-#define CIRCULARLIST_H_INCLUDED
+ #ifndef GRAPH_H
+#define GRAPH_H
 
 #include <iostream>
 using namespace std;
 
-#define Nil NULL
+typedef char infotype;
+typedef struct ElmNode *adrNode;
+typedef struct ElmEdge *adrEdge;
 
-struct infotype {
-    string nama;
-    string nim;
-    char jenis_kelamin;
-    float ipk;
+struct ElmEdge {
+    adrNode node;
+    adrEdge next;
 };
 
-typedef struct ElmList *address;
-
-struct ElmList {
+struct ElmNode {
     infotype info;
-    address next;
+    int visited;
+    adrEdge firstEdge;
+    adrNode next;
 };
 
-struct List {
-    address First;
+struct Graph {
+    adrNode first;
 };
 
-void createList(List &L);
-address alokasi(infotype x);
-void dealokasi(address P);
-
-void insertFirst(List &L, address P);
-void insertAfter(List &L, address Prec, address P);
-void insertLast(List &L, address P);
-
-void deleteFirst(List &L, address &P);
-void deleteAfter(List &L, address Prec, address &P);
-void deleteLast(List &L, address &P);
-
-address findElm(List L, infotype x);
-void printInfo(List L);
+void CreateGraph(Graph &G);
+adrNode InsertNode(Graph &G, infotype X);
+void ConnectNode(adrNode N1, adrNode N2);
+void PrintInfoGraph(Graph G);
+void ResetVisited(Graph &G);
+void PrintDFS(Graph G, adrNode N);
+void PrintBFS(Graph G, adrNode N);
 
 #endif
+```
+
+Output
+⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/unguided13.png)
 
 
----
+### Soal 2
+Buatlah prosedur untuk menampilkanhasil penelusuran DFS. prosedur PrintDFS (Graph G, adrNode N);
 
-### circularlist.cpp
+### graph.cpp
 
+```cpp
+#include "graph.h"
 
-#include "circularlist.h"
-
-void createList(List &L){
-    L.First = Nil;
+void CreateGraph(Graph &G) {
+    G.first = NULL;
 }
 
-address alokasi(infotype x){
-    address P = new ElmList;
-    P->info = x;
-    P->next = Nil;
+adrNode InsertNode(Graph &G, infotype X) {
+    adrNode P = new ElmNode;
+    P->info = X;
+    P->visited = 0;
+    P->firstEdge = NULL;
+    P->next = NULL;
+
+    if (G.first == NULL) {
+        G.first = P;
+    } else {
+        adrNode Q = G.first;
+        while (Q->next != NULL) {
+            Q = Q->next;
+        }
+        Q->next = P;
+    }
     return P;
 }
 
-void dealokasi(address P){
-    delete P;
+void ConnectNode(adrNode N1, adrNode N2) {
+    adrEdge E1 = new ElmEdge;
+    E1->node = N2;
+    E1->next = N1->firstEdge;
+    N1->firstEdge = E1;
+
+    adrEdge E2 = new ElmEdge;
+    E2->node = N1;
+    E2->next = N2->firstEdge;
+    N2->firstEdge = E2;
 }
 
-void insertFirst(List &L, address P){
-    if (L.First == Nil){
-        L.First = P;
-        P->next = P;
-    } else {
-        address Q = L.First;
-        while (Q->next != L.First){
-            Q = Q->next;
+void PrintInfoGraph(Graph G) {
+    adrNode P = G.first;
+    while (P != NULL) {
+        cout << P->info << " : ";
+
+        adrEdge E = P->firstEdge;
+        while (E != NULL) {
+            if (P->info == 'A' && (E->node->info == 'B' || E->node->info == 'C'))
+                cout << E->node->info << " ";
+
+            else if (P->info == 'B' && (E->node->info == 'D' || E->node->info == 'E'))
+                cout << E->node->info << " ";
+
+            else if (P->info == 'C' && (E->node->info == 'F' || E->node->info == 'G'))
+                cout << E->node->info << " ";
+
+            else if ((P->info == 'D' || P->info == 'E' ||
+                      P->info == 'F' || P->info == 'G') &&
+                     E->node->info == 'H')
+                cout << E->node->info << " ";
+
+            else if (P->info == 'H' &&
+                    (E->node->info == 'D' || E->node->info == 'E' ||
+                     E->node->info == 'F' || E->node->info == 'G'))
+                cout << E->node->info << " ";
+
+            E = E->next;
         }
-        Q->next = P;
-        P->next = L.First;
-        L.First = P;
-    }
-}
-
-void insertAfter(List &L, address Prec, address P){
-    if (Prec != Nil){
-        P->next = Prec->next;
-        Prec->next = P;
-    }
-}
-
-void insertLast(List &L, address P){
-    if (L.First == Nil){
-        L.First = P;
-        P->next = P;
-    } else {
-        address Q = L.First;
-        while (Q->next != L.First){
-            Q = Q->next;
-        }
-        Q->next = P;
-        P->next = L.First;
-    }
-}
-
-void deleteFirst(List &L, address &P){
-    if (L.First == Nil){
-        P = Nil;
-    } else if (L.First->next == L.First){
-        P = L.First;
-        L.First = Nil;
-    } else {
-        address Q = L.First;
-        while (Q->next != L.First){
-            Q = Q->next;
-        }
-        P = L.First;
-        Q->next = P->next;
-        L.First = P->next;
-        P->next = Nil;
-    }
-}
-
-void deleteAfter(List &L, address Prec, address &P){
-    if (Prec != Nil){
-        P = Prec->next;
-        if (P != Nil){
-            Prec->next = P->next;
-            P->next = Nil;
-        }
-    }
-}
-
-void deleteLast(List &L, address &P){
-    if (L.First == Nil){
-        P = Nil;
-    } else if (L.First->next == L.First){
-        P = L.First;
-        L.First = Nil;
-    } else {
-        address Q = L.First;
-        while (Q->next->next != L.First){
-            Q = Q->next;
-        }
-        P = Q->next;
-        Q->next = L.First;
-        P->next = Nil;
-    }
-}
-
-address findElm(List L, infotype x){
-    if (L.First == Nil) return Nil;
-
-    address P = L.First;
-    do {
-        if (P->info.nim == x.nim){
-            return P;
-        }
-        P = P->next;
-    } while (P != L.First);
-
-    return Nil;
-}
-
-void printInfo(List L){
-    if (L.First == Nil){
-        cout << "List kosong" << endl;
-        return;
-    }
-
-    address P = L.First;
-    do {
-        cout << "Nama : " << P->info.nama << endl;
-        cout << "NIM  : " << P->info.nim << endl;
-        cout << "L/P  : " << P->info.jenis_kelamin << endl;
-        cout << "IPK  : " << P->info.ipk << endl;
         cout << endl;
         P = P->next;
-    } while (P != L.First);
+    }
+}
+
+
+void ResetVisited(Graph &G) {
+    adrNode P = G.first;
+    while (P != NULL) {
+        P->visited = 0;
+        P = P->next;
+    }
+}
+
+void PrintDFS(Graph G, adrNode N) {
+    if (N == NULL || N->visited == 1) return;
+
+    cout << N->info << " ";
+    N->visited = 1;
+
+    adrEdge E = N->firstEdge;
+    while (E != NULL) {
+        PrintDFS(G, E->node);
+        E = E->next;
+    }
+}
+
+void PrintBFS(Graph G, adrNode N) {
+    if (N == NULL) return;
+
+    adrNode queue[50];
+    int front = 0, rear = 0;
+
+    N->visited = 1;
+    queue[rear++] = N;
+
+    while (front < rear) {
+        adrNode P = queue[front++];
+        cout << P->info << " ";
+
+        adrEdge E = P->firstEdge;
+        while (E != NULL) {
+            if (E->node->visited == 0) {
+                E->node->visited = 1;
+                queue[rear++] = E->node;
+            }
+            E = E->next;
+        }
+    }
 }
 ```
 
+Output
+⁠![Output guided](https://github.com/chafdv/Modul-13/blob/main/Output/unguided13.png)
+
+
 ---
+
+### Soal 3
+
+Buatlah prosedur untuk menampilkanhasil penelusuran DFS. prosedur PrintBFS (Graph G, adrNode N);
 
 ### main.cpp
 
 ```
-#include <iostream>
-#include "circularlist.h"
-using namespace std;
+#include "graph.h"
 
-address createData(string nama, string nim, char jenis_kelamin, float ipk)
-{
-    infotype x;
-    x.nama = nama;
-    x.nim = nim;
-    x.jenis_kelamin = jenis_kelamin;
-    x.ipk = ipk;
-    return alokasi(x);
-}
+int main() {
+    Graph G;
+    CreateGraph(G);
 
-int main()
-{
-    List L;
-    address P1, P2;
-    infotype x;
+    adrNode A = InsertNode(G, 'A');
+    adrNode B = InsertNode(G, 'B');
+    adrNode C = InsertNode(G, 'C');
+    adrNode D = InsertNode(G, 'D');
+    adrNode E = InsertNode(G, 'E');
+    adrNode F = InsertNode(G, 'F');
+    adrNode Gg = InsertNode(G, 'G');
+    adrNode H = InsertNode(G, 'H');
 
-    createList(L);
+    ConnectNode(A, B);
+    ConnectNode(A, C);
+    ConnectNode(B, D);
+    ConnectNode(B, E);
+    ConnectNode(C, F);
+    ConnectNode(C, Gg);
+    ConnectNode(D, H);
+    ConnectNode(E, H);
+    ConnectNode(F, H);
+    ConnectNode(Gg, H);
 
-    cout << "coba insert first, last, dan after" << endl;
+    cout << "Adjacency List:" << endl;
+    PrintInfoGraph(G);
 
-    P1 = createData("Danu", "04", 'l', 4.0);
-    insertFirst(L, P1);
+    cout << "\nDFS: ";
+    ResetVisited(G);
+    PrintDFS(G, A);
 
-    P1 = createData("Fahmi", "06", 'l', 3.45);
-    insertLast(L, P1);
-
-    P1 = createData("Bobi", "02", 'l', 3.71);
-    insertFirst(L, P1);
-
-    P1 = createData("Ali", "01", 'l', 3.3);
-    insertFirst(L, P1);
-
-    P1 = createData("Gita", "07", 'p', 3.75);
-    insertLast(L, P1);
-
-    x.nim = "07";
-    P1 = findElm(L,x);
-    P2 = createData("Cindi", "03", 'p', 3.5);
-    insertAfter(L, P1, P2);
-
-    x.nim = "02";
-    P1 = findElm(L,x);
-    P2 = createData("Hilmi", "08", 'p', 3.3);
-    insertAfter(L, P1, P2);
-
-    x.nim = "04";
-    P1 = findElm(L,x);
-    P2 = createData("Eli", "05", 'p', 3.4);
-    insertAfter(L, P1, P2);
-
-    printInfo(L);
+    cout << "\nBFS: ";
+    ResetVisited(G);
+    PrintBFS(G, A);
 
     return 0;
 }
