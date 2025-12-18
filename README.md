@@ -1,5 +1,5 @@
 
-# <h1 align="center">Laporan Praktikum Struktur Data<br> Modul 13 MULTI LINKED LIST </h1>
+# <h1 align="center">Laporan Praktikum Struktur Data<br> Modul 14 MULTI LINKED LIST </h1>
 <p align="center">Osha Alfida Valyana / 103112430202</p>
 
 ## Dasar Teori
